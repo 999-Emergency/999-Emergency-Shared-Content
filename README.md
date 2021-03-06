@@ -1,6 +1,8 @@
 # 999 Emergency
 
-999 Emergency is a pack of Photon enabled British Emergency Vehicles.
+999 Emergency is a pack of Photon & VCmod enabled British Emergency Vehicles.
+
+This pack will contain ALL of our shared content, such as textures, sirens and sprites. Used across our Photon & VCmod ELS pack.
 
 ## Our Aims
 
