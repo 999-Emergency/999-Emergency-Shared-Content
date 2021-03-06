@@ -46,6 +46,7 @@ We wanted to also name ourselves after something that you could easily connect t
 | [Super Mighty](https://github.com/SuperMighty1) | Skins, Project Coordination |
 | [MattDavidJ](https://steamcommunity.com/profiles/76561198230436120) | Skins, Project Coordination |
 | [iSchmal](https://github.com/ischmal) | Photon Lighting Engine |
+| [Free](https://steamcommunity.com/id/freemmaann/) | VCmod |
 | [Noble](https://github.com/Noble-N9) | Whelen M9 |
 | [Creator2013](https://steamcommunity.com/id/creator_2013) | Scene Lighting |
 | [LoneWolfie](https://steamcommunity.com/id/LoneBalto) | Models & Skins, Vehicles |
