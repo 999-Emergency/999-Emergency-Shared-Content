@@ -1,0 +1,18 @@
+"unlitGeneric"
+{
+	"$basetexture" "models/metrohd/vw_multivan/999dash"
+	"$nodecal" "1"
+	"$phong" "1"
+	"$phongexponent" "30"
+	"$phongfresnelranges" "[0.1 0.5 1]" 
+	"$phongboost" "1"
+	"$colorfix" "{255 255 255}"
+	"Proxies"
+	{
+		"Equals"
+		{
+			srcVar1 $colorfix
+			resultVar	$color
+		}
+	}
+}

@@ -1,0 +1,25 @@
+"vertexlitgeneric"
+{
+
+	"$basetexture" "models/supermighty/999/skin"
+	"$bumpmap" "models/supermighty/shared/skin_nm"
+
+	"$normalmapalphaenvmapmask" 1
+	"$phong" "1"
+	"$phongexponent" "2"
+	"$phongboost" "0.01"	
+	"$phongfresnelranges"	"[1 1 1]"
+	"$nodecal" "1"
+	"$color2" "{255 50 50}"
+	"Proxies"
+	{
+		"Equals"
+		{
+			srcVar1 $colorfix
+			resultVar	$color
+		}
+	}
+}
+
+
+

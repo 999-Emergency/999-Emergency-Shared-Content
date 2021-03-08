@@ -1,0 +1,35 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/creator_2013/woodway_perimeter_scene_light/glass"
+	"$bumpmap"    "models/creator_2013/woodway_perimeter_scene_light/bumpmap"
+	"$translucent" 1
+	"$normalmapalphaenvmapmask" 1
+	"$nodecal" "1"
+                "$nocull" "1"
+
+	"$phong" 1
+	"$phongtint" "[1 1 1]"
+	"$phongexponent" 120
+	"$phongboost" "2"
+	"$phongfresnelranges" "[.1 .3 .2]" 
+
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[0.3 0.3 0.25]"
+	"$envmapfresnel" "1"
+
+	"$rimlight" "1"
+	"$rimlightexponent" "4"
+	"$rimlightboost" "0.1"
+//	"$rimmask" "1"
+
+	"$colorfix" "[1 1 1]"
+	"Proxies"
+	{
+		"Equals"
+		{
+			srcVar1 $colorfix
+			resultVar	$color
+		}
+	}
+}
+
