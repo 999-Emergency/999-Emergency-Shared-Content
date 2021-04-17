@@ -11,7 +11,7 @@
 	"$phongfresnelranges" "[4 1 4]"
 	"$surfaceprop" "Glass"
 	"$envmapFresnel" "1"
-	"$envmaptint" "[.75 .75 .75]"
+	"$envmaptint" "[0.2 .00 .0.0]"
 	"$carpenisenabled" "1"
 	Proxies // proxies are listed inside this block
 	{
