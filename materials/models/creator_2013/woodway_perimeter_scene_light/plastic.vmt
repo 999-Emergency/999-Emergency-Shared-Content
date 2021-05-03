@@ -1,0 +1,27 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/creator_2013/woodway_perimeter_scene_light/plastic"
+	"$bumpmap" "models/creator_2013/woodway_perimeter_scene_light/bumpmap"
+	"$normalmapalphaenvmapmask" 1
+	"$blendtintbybasealpha" "1"
+	"$nocull" "1"
+	"$nodecal" "1"
+   	$surfaceprop "metal"
+
+    	$phong "1"
+    	$phongexponent "10"
+    	$phongboost "1"
+    	$phongfresnelranges "[ .3 .2 1]"
+
+    	"$colorfix" "[1 1 1]"
+    	"Proxies"
+    	{
+       		 "Equals"
+       		 {
+           			 srcVar1 $colorfix
+          			 resultVar    $color
+       		 }
+    	}
+}
+
+

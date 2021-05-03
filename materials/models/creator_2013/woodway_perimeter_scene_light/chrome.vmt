@@ -1,0 +1,23 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/creator_2013/woodway_perimeter_scene_light/chrome"
+	"$bumpmap" "models/creator_2013/woodway_perimeter_scene_light/bumpmap"
+	"$envmap" env_cubemap
+	"$envmaptint" "[1.25 1.25 1.25]"
+	"$envmapmasknormalmapalpha" "1"
+	"$phong" "1"
+	"$phongexponent" "10"
+	"$phongboost" "2.5"	
+	"$phongfresnelranges"	"[.3 1 8]"
+	"$carpenisenabled" "[.2 .2 .2]"
+	Proxies // proxies are listed inside this block
+	{
+		Equals 
+		{
+			srcVar1 $carpenisenabled
+			resultVar	$color // The shader parameter to be manipulated
+
+		}
+	}
+	$nocull 1
+}
