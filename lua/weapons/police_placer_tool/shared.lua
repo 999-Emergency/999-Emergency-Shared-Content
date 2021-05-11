@@ -283,9 +283,9 @@ if CLIENT then
             end )
             return
         end
-        if not IsValid( BuildingPreview ) then return end
+        if not IsValid( policePropPreview ) then return end
 
-        local preview = BuildingPreview
+        local preview = policePropPreview
         if preview:GetModel() == fallbackModel then
             preview:SetColor( hideColor )
             return
@@ -343,7 +343,7 @@ if CLIENT then
             placeTime = CurTime()
 
             net.Start( "Police.Props.Spawn" )
-                net.WriteString( BuildingPreview:GetModel() )
+                net.WriteString( policePropPreview:GetModel() )
                 net.WriteVector( vFlushPoint - b )
                 net.WriteVector( b )
                 net.WriteAngle( ang )
@@ -354,23 +354,23 @@ if CLIENT then
     end
 
     function CreateBuildPreview( mdl )
-        if not IsValid( BuildingPreview ) then
-            BuildingPreview = ents.CreateClientProp( "prop_physics" )
-            BuildingPreview:SetModel( mdl )
-            BuildingPreview:Spawn()
+        if not IsValid( policePropPreview ) then
+            policePropPreview = ents.CreateClientProp( "prop_physics" )
+            policePropPreview:SetModel( mdl )
+            policePropPreview:Spawn()
         else
-            BuildingPreview:SetModel( mdl )
+            policePropPreview:SetModel( mdl )
         end
 
-        hook.Add("CreateMove", BuildingPreview, function( ent, cmd )
+        hook.Add( "CreateMove", policePropPreview, function( ent, cmd )
             cmd:RemoveKey( IN_ATTACK )
             cmd:RemoveKey( IN_RELOAD )
         end )
     end
 
     function RemoveBuildPreview()
-        if IsValid( BuildingPreview ) then
-            BuildingPreview:Remove()
+        if IsValid( policePropPreview ) then
+            policePropPreview:Remove()
         end
     end
 
@@ -386,7 +386,6 @@ if CLIENT then
         
         if ( ent:GetPos():DistToSqr( ply:GetPos() ) < maxDistance ) then
             local max = ent:OBBMaxs()
-            
             local pos = ent:GetPos()
             pos = Vector( pos.x, pos.y, pos.z + max.z / 2 )
             pos = pos:ToScreen()
@@ -398,7 +397,7 @@ if CLIENT then
             surface.SetDrawColor( colOne )
             surface.SetFont( textFont )
             
-            local textW,textH = surface.GetTextSize( textStr )
+            local textW, textH = surface.GetTextSize( textStr )
             tipW = textW + 20
             surface.DrawRect( pos.x - tipW * 0.5, pos.y - tipH * 0.5, tipW, tipH )
             draw.SimpleText( textStr, textFont, pos.x, pos.y, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
@@ -409,7 +408,7 @@ if CLIENT then
     end
 
     function DrawPolicePropInfo()
-        if not IsValid( BuildingPreview ) then return end
+        if not IsValid( policePropPreview ) then return end
         
         local ply = LocalPlayer()
         local scrw, scrh = ScrW(), ScrH()
@@ -417,8 +416,8 @@ if CLIENT then
         local groundPos = ply:GetEyeTrace().HitPos:ToScreen()
         local titleText = ""
         if heightVector then
-            local min, max = BuildingPreview:GetModelBounds()
-            local buildingPos = BuildingPreview:GetPos()
+            local min, max = policePropPreview:GetModelBounds()
+            local buildingPos = policePropPreview:GetPos()
             buildingPos.z = buildingPos.z
 
             local difference = buildingPos - heightVector
@@ -432,9 +431,9 @@ if CLIENT then
                 titleText = "Height: " .. dist .. "m "
             end
         end
-        titleText = titleText .. math.abs( BuildingPreview:GetAngles().y % 360 ) .. " Degrees"
+        titleText = titleText .. math.abs( policePropPreview:GetAngles().y % 360 ) .. " Degrees"
         
-        addNamePlate( BuildingPreview, titleText )
+        addNamePlate( policePropPreview, titleText )
     end
 
     net.Receive( "Police.Props.Notify", function()
