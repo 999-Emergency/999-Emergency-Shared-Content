@@ -80,6 +80,7 @@ When we started this project, we were only going to create Emergency vehicles fr
 | [SGM](https://github.com/SentryGunMan) | Custom Models, Airbus EC-135 |
 | [Joshua Piper](https://github.com/JoshPiper) | GitHub, Documentation, Backend |
 | [TDM](https://steamcommunity.com/id/TheDanishMaster) | Models |
+| [Sir Zac](https://steamcommunity.com/id/sir_zac/) | Police Tool Swep |
 
 ## Supporters
 | Name | Contributions |
