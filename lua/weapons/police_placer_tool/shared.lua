@@ -2,15 +2,15 @@ if SERVER then
     AddCSLuaFile( "shared.lua" )
 end
 
-if CLIENT then
-    local propList = {
-        "models/999pack/traffic_cone/traffic_cone.mdl",
-        "models/999pack/police_sign/police_sign.mdl"
-    }
-    local maxDistance = 275625
-    local maxNumberPoliceProps = 15
-    local PoliceSelectedProp = 1
+local propList = {
+    "models/999pack/traffic_cone/traffic_cone.mdl",
+    "models/999pack/police_sign/police_sign.mdl"
+}
+local maxDistance = 275625
+local maxNumberPoliceProps = 15
+local PoliceSelectedProp = 1
 
+if CLIENT then
     SWEP.PrintName = "Police Prop Placer"
     SWEP.Slot = 0
     SWEP.SlotPos = 0
@@ -333,7 +333,7 @@ if CLIENT then
 --        if not canBuild then return end
 
         placeTime = placeTime or CurTime()
-        if ( self.switchCoolDown and self.switchCoolDown < CurTime() ) and gui.MouseX() == 0 and input.IsMouseDown( MOUSE_FIRST ) and placeTime + 1.2 < CurTime() then
+        if ( ply:GetActiveWeapon().switchCoolDown and ply:GetActiveWeapon().switchCoolDown < CurTime() ) and gui.MouseX() == 0 and input.IsMouseDown( MOUSE_FIRST ) and placeTime + 1.2 < CurTime() then
             holdTime = holdTime + 10 * FrameTime()
             if holdTime < 2 then return end
 
