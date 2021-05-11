@@ -2,14 +2,15 @@ if SERVER then
     AddCSLuaFile( "shared.lua" )
 end
 
-local maxDistance = 275625
-local maxNumberPoliceProps = 15
-local propList = {
-    "models/999pack/traffic_cone/traffic_cone.mdl",
-    "models/999pack/police_sign/police_sign.mdl"
-}
-
 if CLIENT then
+    local propList = {
+        "models/999pack/traffic_cone/traffic_cone.mdl",
+        "models/999pack/police_sign/police_sign.mdl"
+    }
+    local maxDistance = 275625
+    local maxNumberPoliceProps = 15
+    local PoliceSelectedProp = 1
+
     SWEP.PrintName = "Police Prop Placer"
     SWEP.Slot = 0
     SWEP.SlotPos = 0
@@ -44,13 +45,11 @@ SWEP.Secondary.DefaultClip  = 0
 SWEP.Secondary.Automatic    = false
 SWEP.Secondary.Ammo         = ""
 
-local switchCoolDown = 0
-local PoliceSelectedProp = 1
 function SWEP:Initialize()
     self:SetHoldType( "normal" )
 
     if CLIENT then
-        switchCoolDown = CurTime() + 2
+        self.switchCoolDown = CurTime() + 2
         CreateBuildPreview( propList[ PoliceSelectedProp ] )
         hook.Add( "PostDrawOpaqueRenderables", "PolicePropPreview", DrawPolicePropHook )
         hook.Add( "HUDPaint", "PolicePropPreview", DrawPolicePropInfo )
@@ -61,7 +60,7 @@ end
 function SWEP:Deploy()
     if SERVER then return end
 
-    switchCoolDown = CurTime() + 2
+    self.switchCoolDown = CurTime() + 2
     CreateBuildPreview( propList[ PoliceSelectedProp ] )
     hook.Add( "PostDrawOpaqueRenderables", "PolicePropPreview", DrawPolicePropHook )
     hook.Add( "HUDPaint", "PolicePropPreview", DrawPolicePropInfo )
@@ -91,18 +90,18 @@ function SWEP:SecondaryAttack()
     SafeRemoveEntity( traceEnt )
 end
 
-function HasEntityCollisions(ent, pos)
+local function HasEntityCollisions( ent, pos )
     local tr = util.TraceEntityOBB( { start = pos, endpos = pos, filter = ent }, ent, true )
     return tr.Hit
 end
 
-function HasModelCollisions(ent, classname)
+local function HasModelCollisions( ent, classname )
     local min,max = ent:GetModelBounds()
     min = ent:LocalToWorld( min )
     max = ent:LocalToWorld( max )
     local collided = false
     
-    for k,v in pairs( ents.FindInBox( min, max ) ) do
+    for k, v in pairs( ents.FindInBox( min, max ) ) do
         if classname and ( v != ent ) and v:GetClass() == classname then
             collided = true
             break
@@ -120,7 +119,7 @@ function HasModelCollisions(ent, classname)
 end
 
 -- Credit to Xavier for creating this function for XLib
-function util.TraceEntityOBB(tracedata, ent, quick, verbose)
+function util.TraceEntityOBB( tracedata, ent, quick, verbose )
     local mins, maxs = ent:GetCollisionBounds()
     mins = mins + (tracedata.mins or Vector())
     maxs = maxs + (tracedata.maxs or Vector())
@@ -269,19 +268,14 @@ if CLIENT then
 
     local ang = Angle()
     local vFlushPoint = Vector()
-    local show = true
-    local placeData = {}
-    local previewData = {}
-    local showPurchease = true
     local canBuild = true
-    local buildMsg
     local defaultColor = Color(0, 255, 255, 100)
     local noBuildColor = Color(255, 0, 0, 150)
 
     function DrawPolicePropHook()
         local ply = LocalPlayer()
         if not IsValid( ply:GetActiveWeapon() ) then return end
-        if ( ply:GetActiveWeapon():GetClass() ~= "police_placer_tool" ) then
+        if ( ply:GetActiveWeapon():GetClass() ~= "police_placer_tool" ) then -- Act as holster trigger
             hook.Remove( "PostDrawOpaqueRenderables", "PolicePropPreview" )
             hook.Remove( "HUDPaint", "PolicePropPreview" )
             timer.Simple( 0.01, function()
@@ -339,7 +333,7 @@ if CLIENT then
 --        if not canBuild then return end
 
         placeTime = placeTime or CurTime()
-        if ( switchCoolDown and switchCoolDown < CurTime() ) and gui.MouseX() == 0 and input.IsMouseDown( MOUSE_FIRST ) and placeTime + 1.2 < CurTime() then
+        if ( self.switchCoolDown and self.switchCoolDown < CurTime() ) and gui.MouseX() == 0 and input.IsMouseDown( MOUSE_FIRST ) and placeTime + 1.2 < CurTime() then
             holdTime = holdTime + 10 * FrameTime()
             if holdTime < 2 then return end
 
@@ -370,11 +364,7 @@ if CLIENT then
 
         hook.Add("CreateMove", BuildingPreview, function( ent, cmd )
             cmd:RemoveKey( IN_ATTACK )
-    --        cmd:RemoveKey( IN_ATTACK2 )
             cmd:RemoveKey( IN_RELOAD )
-    --        if input.IsMouseDown( MOUSE_RIGHT ) then
-    --            BuildingPreview:Remove()
-    --        end
         end )
     end
 
@@ -424,9 +414,6 @@ if CLIENT then
         local ply = LocalPlayer()
         local scrw, scrh = ScrW(), ScrH()
         
-        if buildMsg then 
-            draw.SimpleTextOutlined( buildMsg:upper(), "", scrw * 0.5, scrh * 0.95, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, Color(204, 37, 37) )
-        end
         local groundPos = ply:GetEyeTrace().HitPos:ToScreen()
         local titleText = ""
         if heightVector then
@@ -448,7 +435,6 @@ if CLIENT then
         titleText = titleText .. math.abs( BuildingPreview:GetAngles().y % 360 ) .. " Degrees"
         
         addNamePlate( BuildingPreview, titleText )
-
     end
 
     net.Receive( "Police.Props.Notify", function()
@@ -499,7 +485,6 @@ else
 
         propSpawn:Spawn()
         propSpawn.IsPoliceSpawned = true
---        propSpawn:DropToFloor()
         
         ply.SpawnedPoliceProps = ply.SpawnedPoliceProps or {}
         ply.SpawnedPoliceProps[ propSpawn:EntIndex() ] = propSpawn
