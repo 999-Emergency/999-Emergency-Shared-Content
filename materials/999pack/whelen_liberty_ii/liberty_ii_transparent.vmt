@@ -1,0 +1,26 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "999pack/whelen_liberty_ii/liberty_ii"
+	"$bumpmap" "999pack/whelen_liberty_ii/skin_nm"
+"$nocull" "1"
+    $surfaceprop "metal"
+	"$envmap" env_cubemap
+	"$envmaptint" "[1 1 1]"
+	"$envmapmasknormalmapalpha" "1"
+    $phong "1"
+    $phongexponent "7"
+    $phongboost "1"
+    $phongfresnelranges "[1 1 1]"
+	"$alphatest" "1"
+	"$allowalphatocoverage" "1"
+	"$carpenisenabled" "1"
+	Proxies
+	{
+		Equals 
+		{
+			srcVar1 $carpenisenabled
+			resultVar	$color 
+
+		}
+	}
+}
