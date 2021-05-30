@@ -81,6 +81,7 @@ When we started this project, we were only going to create Emergency vehicles fr
 | [Joshua Piper](https://github.com/JoshPiper) | GitHub, Documentation, Backend |
 | [TDM](https://steamcommunity.com/id/TheDanishMaster) | Models |
 | [Sir Zac](https://steamcommunity.com/id/sir_zac/) | Police Tool Swep |
+| [Adolf Gutenberg](https://steamcommunity.com/id/AdolfGutenberg) | New NHS HART skins London, North West, West Midland and East of England |
 
 ## Supporters
 | Name | Contributions |
