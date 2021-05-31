@@ -48,11 +48,11 @@ When we started this project, we were only going to create Emergency vehicles fr
 
 ## Social & Support
 
-• [999Emergency Shared Content]() NOT RELEASED
+• [999Emergency Shared Content](https://steamcommunity.com/sharedfiles/filedetails/?id=2475153328) 
 
 • [999Emergency Photon Pack](https://steamcommunity.com/sharedfiles/filedetails/?id=2176739978)
 
-• [999Emergency VCmod Pack](https://steamuserimages-a.akamaihd.net/ugc/1749057761574116742/23170B49DDDCBEE02A217E889DFAB61F01A05F8B/) NOT RELEASED
+• [999Emergency VCmod Pack](https://steamcommunity.com/sharedfiles/filedetails/?id=2475804504) 
 
 • [999Emergency NHS Models](https://steamcommunity.com/sharedfiles/filedetails/?id=2410835801)
 
@@ -80,6 +80,8 @@ When we started this project, we were only going to create Emergency vehicles fr
 | [SGM](https://github.com/SentryGunMan) | Custom Models, Airbus EC-135 |
 | [Joshua Piper](https://github.com/JoshPiper) | GitHub, Documentation, Backend |
 | [TDM](https://steamcommunity.com/id/TheDanishMaster) | Models |
+| [Sir Zac](https://steamcommunity.com/id/sir_zac/) | Police Tool Swep |
+| [Adolf Gutenberg](https://steamcommunity.com/id/AdolfGutenberg) | New NHS HART skins London, North West, West Midland and East of England |
 
 ## Supporters
 | Name | Contributions |
