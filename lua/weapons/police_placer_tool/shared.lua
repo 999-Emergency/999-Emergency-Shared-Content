@@ -232,7 +232,6 @@ if CLIENT then
 	        preview:SetNoDraw( true )
 
         	if not haloDrawing then
-        		print("hali")
         		haloDrawing = true
         		hook.Add( "PreDrawHalos", "Police.Props.Halo", function()
 					halo.Add( { tr.Entity }, haloColor, 5, 5, 2 )
@@ -248,7 +247,7 @@ if CLIENT then
 
         for k, v in pairs( keyControls ) do
             if v.presstime + ( tracingMultSkinEnt and 0.5 or v.cooldown ) < CurTime() and input.IsKeyDown( v.key ) then
-            	if tracingMultSkinEnt then
+            	if tracingMultSkinEnt and v.callbackEnt then
             		v.callbackEnt( traceEnt )
             	else
 	                ang = v.callback( ang )
