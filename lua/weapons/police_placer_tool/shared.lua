@@ -2,6 +2,9 @@ if SERVER then
     AddCSLuaFile( "shared.lua" )
     util.AddNetworkString( "Police.Props.Deploy" )
     util.AddNetworkString( "Police.Props.Holster" )
+    util.AddNetworkString( "Police.Props.Skin" )
+    util.AddNetworkString( "Police.Props.Notify" )
+    util.AddNetworkString( "Police.Props.Spawn" )
 end
 
 local propList = {
@@ -10,6 +13,7 @@ local propList = {
 }
 local maxDistance = 275625
 local PoliceSelectedProp = 1
+--local policePropPreview
 if SERVER then
     CreateConVar( "PolicePropsMax", 15, FCVAR_NONE, "Sets the maximum amount of spawnables per player.", 0, 50 )
 end
@@ -17,13 +21,13 @@ end
 if CLIENT then
     SWEP.PrintName = "Police Prop Placer"
     SWEP.Slot = 0
-    SWEP.SlotPos = 0
+    SWEP.SlotPos = 4
     SWEP.DrawAmmo = false
     SWEP.DrawCrosshair = false 
 end
 
 SWEP.Author         = "Sir Zac"
-SWEP.Instructions   = "Hold Left Click: Place chosen prop \nRight Click: Delete target prop \nT: Cycles to next prop \nShift: Resets rotation \nE/R: Rotate"
+SWEP.Instructions   = "Hold Left Click: Place chosen prop \nRight Click: Delete target prop \nT: Cycles to next prop \nShift: Resets rotation \nE/R: Rotates and changes skins of target entities"
 SWEP.Contact        = ""
 SWEP.Purpose        = ""
 SWEP.Category       = "999Emergency"
@@ -94,7 +98,7 @@ function SWEP:SecondaryAttack()
 
     local traceEnt = trace.Entity
     if not IsValid( traceEnt ) then return end
-    if not traceEnt.IsPoliceSpawned then return end
+    if not traceEnt:GetNWBool( "IsPoliceProp", false ) then return end
 
     local distance = traceEnt:GetPos():DistToSqr( owner:GetPos() )
     if ( distance > maxDistance ) then return end
@@ -116,6 +120,18 @@ if CLIENT then
             callback = function( ang, pos )
                 ang.yaw = ang.yaw + math.Round( 15 )
                 return ang
+            end,
+            callbackEnt = function( ent )
+            	local skinCount = ent:SkinCount() - 1
+            	local currentSkin = ent:GetSkin()
+            	local newSkin = currentSkin + 1
+            	if newSkin > skinCount then
+            		newSkin = 0
+            	end
+				net.Start( "Police.Props.Skin" )
+            		net.WriteUInt( newSkin, 6 )
+            		net.WriteEntity( ent )
+            	net.SendToServer()
             end
         },
         ["Rotate Backwards"] = {
@@ -125,6 +141,18 @@ if CLIENT then
             callback = function( ang, pos )
                 ang.yaw = ang.yaw - math.Round( 15 )
                 return ang
+            end,
+            callbackEnt = function( ent )
+				local skinCount = ent:SkinCount() - 1
+            	local currentSkin = ent:GetSkin()
+            	local newSkin = currentSkin - 1
+         		if newSkin < 0 then
+         			newSkin = skinCount
+         		end
+            	net.Start( "Police.Props.Skin" )
+            		net.WriteUInt( newSkin, 6 )
+            		net.WriteEntity( ent )
+            	net.SendToServer()
             end
         },
         ["Change Model"] = {
@@ -159,7 +187,11 @@ if CLIENT then
     local targetPos = Vector()
     local defaultColor = Color( 0, 255, 255, 100 )
     local noBuildColor = Color( 255, 0, 0, 50 )
+    local hideColor = Color( 0, 0, 0, 0 )
+    local haloColor = Color( 44, 191, 83 )
     local canBuild = false
+    local tracingMultSkinEnt = false
+    local haloDrawing = false
     function DrawPolicePropHook()
         local ply = LocalPlayer()
         if not IsValid( ply:GetActiveWeapon() ) then return end
@@ -191,12 +223,40 @@ if CLIENT then
         targetPos = tr.HitPos + targetPos
         targetPos.z = math.Clamp( targetPos.z, tr.HitPos.z, 100000 )
 
+        local traceEnt = tr.Entity
+        if IsValid( traceEnt ) and traceEnt:GetNWBool( "IsPoliceProp", false ) then
+        	if ( traceEnt:SkinCount() and traceEnt:SkinCount() > 1 ) then
+	        	tracingMultSkinEnt = true
+	        end
+
+	        preview:SetNoDraw( true )
+
+        	if not haloDrawing then
+        		print("hali")
+        		haloDrawing = true
+        		hook.Add( "PreDrawHalos", "Police.Props.Halo", function()
+					halo.Add( { tr.Entity }, haloColor, 5, 5, 2 )
+				end )
+			end
+        elseif tracingMultSkinEnt or haloDrawing then
+        	if tracingMultSkinEnt then tracingMultSkinEnt = false end
+        	if haloDrawing then
+        		haloDrawing = false
+        		hook.Remove( "PreDrawHalos", "Police.Props.Halo" )
+        	end
+        end
+
         for k, v in pairs( keyControls ) do
-            if v.presstime + v.cooldown < CurTime() and input.IsKeyDown( v.key ) then
-                ang = v.callback( ang )
+            if v.presstime + ( tracingMultSkinEnt and 0.5 or v.cooldown ) < CurTime() and input.IsKeyDown( v.key ) then
+            	if tracingMultSkinEnt then
+            		v.callbackEnt( traceEnt )
+            	else
+	                ang = v.callback( ang )
+	            end
                 v.presstime = CurTime()
             end
         end
+        if tracingMultSkinEnt or haloDrawing then return end
 
         preview:SetPos( targetPos )
         preview:SetAngles( ang )
@@ -209,9 +269,10 @@ if CLIENT then
             preview:SetColor( defaultColor )
             canBuild = true
         end
+        preview:SetNoDraw( false )
 
         placeTime = placeTime or CurTime()
-        if ( ply:GetActiveWeapon().switchCoolDown and ply:GetActiveWeapon().switchCoolDown < CurTime() ) and gui.MouseX() == 0 and input.IsMouseDown( MOUSE_FIRST ) and placeTime + 1.2 < CurTime() then
+        if ( ply:GetActiveWeapon().switchCoolDown and ply:GetActiveWeapon().switchCoolDown < CurTime() ) and gui.MouseX() == 0 and input.IsMouseDown( MOUSE_FIRST ) and placeTime + 1 < CurTime() then
             holdTime = holdTime + 10 * FrameTime()
             if holdTime < 2 then return end
             if not canBuild then return end
@@ -237,7 +298,7 @@ if CLIENT then
             policePropPreview:SetModel( mdl )
         end
 
-        hook.Add( "CreateMove", policePropPreview, function( ent, cmd )
+        hook.Add( "CreateMove", "Police.Props.CreateMove", function( cmd )
             cmd:RemoveKey( IN_ATTACK )
             cmd:RemoveKey( IN_RELOAD )
         end )
@@ -252,8 +313,6 @@ if CLIENT then
     RemoveBuildPreview()
 
     local checkTime = CurTime()
-    local colGreen = Color( 44, 191, 83 )
-
     local colOne = Color( 0, 0, 0, 200 )
     local tipW, tipH = 0, 25
     local function addNamePlate( ent, text )
@@ -284,7 +343,8 @@ if CLIENT then
 
     function DrawPolicePropInfo()
         if not IsValid( policePropPreview ) then return end
-        
+        if tracingMultSkinEnt or haloDrawing then return end
+
         local ply = LocalPlayer()
         local scrw, scrh = ScrW(), ScrH()
         
@@ -306,10 +366,10 @@ if CLIENT then
         timer.Simple( 0.1, function()
             local weapon = LocalPlayer():GetActiveWeapon()
             if not IsValid( weapon ) then return end
-            if ( weapon:GetClass() ~= "police_placer_tool" ) then return end
+			if ( weapon:GetClass() ~= "police_placer_tool" ) then return end
 
             if weapon.LoadHooks then weapon:LoadHooks() end
-        end )
+		end )
     end )
 
     net.Receive( "Police.Props.Holster", function()
@@ -317,7 +377,11 @@ if CLIENT then
         if not IsValid( weapon ) then return end
 
         hook.Remove( "PostDrawOpaqueRenderables", "PolicePropPreview" )
+        hook.Remove( "PreDrawHalos", "Police.Props.Halo" )
         hook.Remove( "HUDPaint", "PolicePropPreview" )
+        hook.Remove( "CreateMove", "Police.Props.CreateMove" )
+        haloDrawing = false
+		tracingMultSkinEnt = false
         timer.Simple( 0.01, function()
             RemoveBuildPreview()
         end )
@@ -329,13 +393,13 @@ else
     end
 
     local function HasModelCollisions( ent, classname )
-        local min,max = ent:GetModelBounds()
+        local min, max = ent:GetModelBounds()
         min = ent:LocalToWorld( min )
         max = ent:LocalToWorld( max )
+
         local collided = false
-        
         for k, v in pairs( ents.FindInBox( min, max ) ) do
-            if classname and ( v ~= ent ) and v:GetClass() == classname then
+            if classname and ( v ~= ent ) and ( v:GetClass() == classname ) then
                 collided = true
                 break
             end
@@ -424,14 +488,22 @@ else
         return tr
     end
 
-    local function Notify( ply, msg )
+    function PoliceNotify( ply, msg )
         net.Start( "Police.Props.Notify" )
             net.WriteString( msg )
         net.Send( ply )
     end
 
-    util.AddNetworkString( "Police.Props.Notify" )
-    util.AddNetworkString( "Police.Props.Spawn" )
+    net.Receive( "Police.Props.Skin", function( len, ply )
+    	if not IsValid( ply ) then return end
+
+        local skin = net.ReadUInt( 6 )
+        local ent = net.ReadEntity()
+        if not IsValid( ent ) then return end
+
+        ent:SetSkin( skin )
+    end )
+
     net.Receive( "Police.Props.Spawn", function( len, ply )
         if not IsValid( ply ) then return end
 
@@ -443,12 +515,12 @@ else
         if not maxNumberPoliceProps then return end
         
         if ply.SpawnedPoliceProps and table.Count( ply.SpawnedPoliceProps ) >= maxNumberPoliceProps then
-            Notify( ply, "You've hit the limit for how many police props you can spawn ( " .. maxNumberPoliceProps .. " )." )
+            PoliceNotify( ply, "You've hit the limit for how many police props you can spawn ( " .. maxNumberPoliceProps .. " )." )
             return
         end
 
         if not ( pos:DistToSqr( ply:GetPos() ) < maxDistance ) then 
-            Notify( ply, "The prop you're trying to place is too far away from you." )
+            PoliceNotify( ply, "The prop you're trying to place is too far away from you." )
             return
         end
 
@@ -465,13 +537,13 @@ else
 
         propSpawn:Spawn()
         propSpawn:Activate()
-        propSpawn.IsPoliceSpawned = true
+        propSpawn:SetNWBool( "IsPoliceProp", true )
         
         ply.SpawnedPoliceProps = ply.SpawnedPoliceProps or {}
         ply.SpawnedPoliceProps[ propSpawn:EntIndex() ] = propSpawn
 
         if HasModelCollisions( propSpawn, "prop_physics" ) then
-            Notify( ply, "Failed to place the item due to collision issues." )
+            PoliceNotify( ply, "Failed to place the item due to collision issues." )
             propSpawn:Remove()
             return
         end
@@ -488,7 +560,7 @@ else
         end
 
         if shouldRemove then
-            Notify( ply, "Failed to place the item due to collision issues." )
+            PoliceNotify( ply, "Failed to place the item due to collision issues." )
             propSpawn:Remove()
             return
         end
@@ -496,7 +568,8 @@ else
 
     hook.Add( "EntityRemoved", "LookForPoliceEnts", function( ent )
         if not IsValid( ent ) then return end
-
+        if not ent:GetNWBool( "IsPoliceProp", false ) then return end
+        
         local owner
         if CPPI then
             owner = ent:CPPIGetOwner()
