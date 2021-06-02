@@ -73,8 +73,7 @@ function SWEP:Holster( switchTo )
     end
 end
 
-local maxDistance = 1000
-local maxDistanceSqrd = maxDistance * maxDistance
+local maxDistanceSqrd = 800000
 function SWEP:PrimaryAttack()
     if not IsFirstTimePredicted() then return end
 
@@ -97,15 +96,13 @@ function SWEP:PrimaryAttack()
     local trace = owner:GetEyeTrace()
     if not trace then return end
 
-
     if ( owner:GetPos():DistToSqr( trace.HitPos ) > maxDistanceSqrd ) then
         if SERVER then PoliceNotify( owner, "You're looking too far." ) end
         return
     end
 
-    if ( IsValid( trace.Entity ) and ( trace.Entity:IsPlayer() or trace.Entity:IsVehicle() ) ) then return end
+    if ( IsValid( trace.Entity ) and ( trace.Entity:IsPlayer() or trace.Entity:IsVehicle() or trace.Entity.isWacAircraft ) ) then return end
     if ( SERVER and not util.IsValidPhysicsObject( trace.Entity, trace.PhysicsBone ) ) then return false end
-
 
     if not self.firstPoint then
         self.firstPoint = trace.HitPos
@@ -120,17 +117,16 @@ function SWEP:PrimaryAttack()
         end
     else
         self.secondPoint = trace.HitPos
-
-        local distance = self.firstPoint:Distance( self.secondPoint )
-        if ( distance > maxDistance ) then
+        local distanceSqrd = self.firstPoint:DistToSqr( self.secondPoint )
+        if ( distanceSqrd > maxDistanceSqrd ) then
             if SERVER then PoliceNotify( owner, "The tapes length is too long." ) end
             return
         end
 
         if SERVER then
-            local traceEnt = trace.Entity
---            local length = ( self.firstPointData.wpos - self.secondPoint ):Length()
-            local tape = constraint.Rope( game.GetWorld(), game.GetWorld(), 0, 0, self.firstPoint, self.secondPoint, distance, 0, 0, 4, self.selectedMaterial, true )
+--            local traceEnt = trace.Entity
+            local length = ( self.firstPoint - self.secondPoint ):Length()
+            local tape = constraint.Rope( game.GetWorld(), game.GetWorld(), 0, 0, self.firstPoint, self.secondPoint, length, 0, 0, 4, self.selectedMaterial, true )
             tape.owner = owner
 
             owner.SpawnedPoliceTape = owner.SpawnedPoliceTape or {}
@@ -239,6 +235,9 @@ function SWEP:SecondaryAttack()
     if not IsValid( owner ) then return end
 
     self:SetNextSecondaryFire( CurTime() + 0.5 )
+
+    if not owner.SpawnedPoliceTape then return end
+    if not owner.SpawnedPoliceTape[ 1 ] then return end
 
     local lastInsert = table.Count( owner.SpawnedPoliceTape[ 1 ] )
     if not lastInsert then return end
