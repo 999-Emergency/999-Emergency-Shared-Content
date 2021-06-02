@@ -240,6 +240,9 @@ function SWEP:SecondaryAttack()
 
     self:SetNextSecondaryFire( CurTime() + 0.5 )
 
+    if not owner.SpawnedPoliceTape then return end
+    if not owner.SpawnedPoliceTape[ 1 ] then return end
+
     local lastInsert = table.Count( owner.SpawnedPoliceTape[ 1 ] )
     if not lastInsert then return end
 
