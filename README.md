@@ -99,6 +99,7 @@ When we started this project, we were only going to create Emergency vehicles fr
 | [droidd]() | Unlocked BMW X5 F15  | 
 | [BG88]() | Unlocked Ford Transit Custom  |
 | [Ceiling★Spiders](https://steamcommunity.com/id/Merissaze) | Paramedic Playermodels (Before re-texture).  |
+| [J.Jonesey](https://www.gta5-mods.com/misc/scotland-police-force-siren-pack#description_tab) | Original Scottish Siren  | [His Discord Support Server](https://discord.gg/jEMa9Uc) 
 
 Any model used by 999Emergency, from custom models to existing models that we've made changes to, has done with permission from the original creator.
 We maintain high standards for quality and respect for the creators. We will always check beforehand with the creator; about rights to make changes where we deem fit and if we're allowed to port it to Garry's Mod.
