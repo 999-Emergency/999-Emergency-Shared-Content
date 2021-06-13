@@ -1,0 +1,20 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/supermighty/2014_sprinter_ambulance/sprinter2"
+	"$bumpmap" "models/supermighty/shared/skin_nm"
+	"$normalmapalphaenvmapmask" 1
+	"$phong" "1"
+	"$phongexponent" "2"
+	"$phongboost" "0.1"	
+	"$phongfresnelranges"	"[1 1 1]"
+	"$nodecal" "1"
+	"$colorfix" "{255 255 255}"
+	"Proxies"
+	{
+		"Equals"
+		{
+			srcVar1 $colorfix
+			resultVar	$color
+		}
+	}
+}

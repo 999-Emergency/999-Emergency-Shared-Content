@@ -1,0 +1,36 @@
+"VertexlitGeneric"
+{
+	"$basetexturetransform" "center 0 0 scale 70 70 rotate 0 translate 0 0"
+	"$basetexture" "models/supermighty/2014_sprinter_ambulance/tint_outer"
+	"$bumpmap" "models/supermighty/shared/skin_nm"
+
+
+	"$translucent" 1
+	"$normalmapalphaenvmapmask" 1
+	"$nodecal" "1"
+
+	"$phong" 1
+	"$phongtint" "[1 1 1]"
+	"$phongexponent" 220
+	"$phongboost" "2"
+	"$phongfresnelranges" "[0.5 0.5 0.5]" 
+
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[0.35 0.35 0.35]"
+	"$envmapfresnel" "1"
+
+	"$rimlight" "1"
+	"$rimlightexponent" "4"
+	"$rimlightboost" "0.1"
+//	"$rimmask" "1"
+
+	"$colorfix" "{255 255 255}"
+	"Proxies"
+	{
+		"Equals"
+		{
+			srcVar1 $colorfix
+			resultVar	$color
+		}
+	}
+}
