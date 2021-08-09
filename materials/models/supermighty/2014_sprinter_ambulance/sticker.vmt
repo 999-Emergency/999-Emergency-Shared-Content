@@ -4,7 +4,7 @@
                 "$basetexture" "models/supermighty/2014_sprinter_ambulance/notice"
 	"$bumpmap" "models/smcars/shared/skin_nm"
 	"$nodecal" "1"
-	"$translucent" "1""
+	"$translucent" "1"
 
 	"$phong" 1
 	"$phongexponent" 5
