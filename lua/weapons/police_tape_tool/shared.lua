@@ -17,10 +17,12 @@ list.Add( "RopeMaterials", "999pack/tape/cordon_tape" )
 list.Add( "RopeMaterials", "999pack/tape/fire_tape" )
 
 if SERVER then
-    CreateConVar( "sbox_maxpolicetape", 15, FVAR_ARCHIVE, "Sets the maximum amount of spawnable tape per player.", 0, 50 )
+    CreateConVar( "sbox_maxpolice_tape", 15, FVAR_ARCHIVE, "Sets the maximum amount of spawnable tape per player.", 0, 50 )
 end
 
 if CLIENT then
+    language.Add( "sboxlimit_police_tape", "You've hit the limit for how much tape you can spawn!" )
+
     SWEP.PrintName = "Police Tape"
     SWEP.Slot = 0
     SWEP.SlotPos = 4
@@ -83,12 +85,12 @@ function SWEP:PrimaryAttack()
     self:SetNextPrimaryFire( CurTime() + 0.5 )
 
     if SERVER then
-        local maxTapes = GetConVar( "sbox_maxpolicetape" ):GetInt()
-        if not maxTapes then return end
+--        local maxTapes = GetConVar( "sbox_maxpolicetape" ):GetInt()
+--        if not maxTapes then return end
 
-        if owner.SpawnedPoliceTape and Player:CheckLimit( "policetape" ) then
+        if not owner:CheckLimit( "police_tape" ) then
             tapeClear( owner )
-            PoliceNotify( owner, "You've hit the limit for how many police tapes you can spawn ( " .. maxTapes .. " )." )
+--            PoliceNotify( owner, "You've hit the limit for how many police tapes you can spawn ( " .. maxTapes .. " )." )
             return
         end
     end
@@ -124,7 +126,6 @@ function SWEP:PrimaryAttack()
         end
 
         if SERVER then
---            local traceEnt = trace.Entity
             local length = ( self.firstPoint - self.secondPoint ):Length()
             local tape = constraint.Rope( game.GetWorld(), game.GetWorld(), 0, 0, self.firstPoint, self.secondPoint, length, 0, 0, 4, self.selectedMaterial, true )
             tape.owner = owner
@@ -134,7 +135,7 @@ function SWEP:PrimaryAttack()
             owner.SpawnedPoliceTape[ 2 ] = owner.SpawnedPoliceTape[ 2 ] or {}
             owner.SpawnedPoliceTape[ 1 ][ #owner.SpawnedPoliceTape[ 1 ] + 1 or 1 ] = tape:EntIndex()
             owner.SpawnedPoliceTape[ 2 ][ tape:EntIndex() ] = tape
-            owner:AddCount( "policetape", tape )
+            owner:AddCount( "police_tape", tape )
 
             PoliceNotify( owner, "The tape has been strung up." )
         end
