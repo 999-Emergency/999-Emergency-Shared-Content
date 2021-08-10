@@ -15,10 +15,12 @@ local maxDistance = 275625
 local PoliceSelectedProp = 1
 --local policePropPreview
 if SERVER then
-    CreateConVar( "sbox_maxpoliceprops", 15, FVAR_ARCHIVE, "Sets the maximum amount of spawnables per player.", 0, 50 )
+    CreateConVar( "sbox_maxpolice_props", 15, FVAR_ARCHIVE, "Sets the maximum amount of spawnable police props per player.", 0, 50 )
 end
 
 if CLIENT then
+    language.Add( "sboxlimit_police_props", "You've hit the limit for how many police props you can spawn!" )
+
     SWEP.PrintName = "Police Prop Placer"
     SWEP.Slot = 0
     SWEP.SlotPos = 4
@@ -27,7 +29,7 @@ if CLIENT then
 end
 
 SWEP.Author         = "Sir Zac"
-SWEP.Instructions   = "Hosen prop \nRight Click: Delete target prop \nT: Cycles to next prop \nShift: Resets rotation \nE/R: Rotates and changes skins of target entities"
+SWEP.Instructions   = "Hold Left Click: Place chosen prop \nRight Click: Delete target prop \nT: Cycles to next prop \nShift: Resets rotation \nE/R: Rotates and changes skins of target entities"
 SWEP.Contact        = ""
 SWEP.Purpose        = ""
 SWEP.Category       = "999Emergency"
@@ -373,7 +375,20 @@ if CLIENT then
             RemoveBuildPreview()
         end )
     end )
+
+    net.Receive( "Police.Props.Notify", function()
+        local msg = net.ReadString()
+        if not msg or msg == "" then return end
+
+        notification.AddLegacy( msg, 0, 5 )
+    end )
 else
+    function PoliceNotify( ply, msg )
+        net.Start( "Police.Props.Notify" )
+            net.WriteString( msg )
+        net.Send( ply )
+    end
+
     local function HasEntityCollisions( ent, pos )
         local tr = util.TraceEntityOBB( { start = pos, endpos = pos, filter = ent }, ent, true )
         return tr.Hit
@@ -492,11 +507,12 @@ else
         local pos = net.ReadVector()
         local ang = net.ReadAngle()
 
-        local maxNumberPoliceProps = GetConVar( "sbox_maxpoliceprops" ):GetInt()
-        if not maxNumberPoliceProps then return end
-        
-        if ply.SpawnedPoliceProps and Player:CheckLimit( "policeprops" ) then
-            PoliceNotify( ply, "You've hit the limit for how many police props you can spawn ( " .. maxNumberPoliceProps .. " )." )
+--        local maxNumberPoliceProps = GetConVar( "sbox_maxpoliceprops" ):GetInt()
+--        if not maxNumberPoliceProps then return end
+
+        print( ply:GetCount( "police_props" ) )
+        if not ply:CheckLimit( "police_props" ) then
+ --           PoliceNotify( ply, "You've hit the limit for how many police props you can spawn ( " .. maxNumberPoliceProps .. " )." )
             return
         end
 
@@ -520,7 +536,7 @@ else
         propSpawn:Activate()
         propSpawn:SetNWBool( "IsPoliceProp", true )
 
-        ply:AddCount( "policetape", propSpawn )
+        ply:AddCount( "police_props", propSpawn )
         ply.SpawnedPoliceProps = ply.SpawnedPoliceProps or {}
         ply.SpawnedPoliceProps[ propSpawn:EntIndex() ] = propSpawn
 
