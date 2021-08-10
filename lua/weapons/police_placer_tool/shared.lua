@@ -15,7 +15,7 @@ local maxDistance = 275625
 local PoliceSelectedProp = 1
 --local policePropPreview
 if SERVER then
-    CreateConVar( "PolicePropsMax", 15, FCVAR_NONE, "Sets the maximum amount of spawnables per player.", 0, 50 )
+    CreateConVar( "sbox_maxpoliceprops", 15, FVAR_ARCHIVE, "Sets the maximum amount of spawnables per player.", 0, 50 )
 end
 
 if CLIENT then
@@ -27,7 +27,7 @@ if CLIENT then
 end
 
 SWEP.Author         = "Sir Zac"
-SWEP.Instructions   = "Hold Left Click: Place chosen prop \nRight Click: Delete target prop \nT: Cycles to next prop \nShift: Resets rotation \nE/R: Rotates and changes skins of target entities"
+SWEP.Instructions   = "Hosen prop \nRight Click: Delete target prop \nT: Cycles to next prop \nShift: Resets rotation \nE/R: Rotates and changes skins of target entities"
 SWEP.Contact        = ""
 SWEP.Purpose        = ""
 SWEP.Category       = "999Emergency"
@@ -216,12 +216,12 @@ if CLIENT then
 
         local tr = util.TraceLine( trace )
         local clampPos = tr.HitPos
-        targetPos = tr.HitPos - ( tr.HitNormal * 512 )
-        preview:SetPos( tr.HitPos )
+        targetPos = clampPos - ( tr.HitNormal * 512 )
+        preview:SetPos( clampPos )
         targetPos = preview:NearestPoint( targetPos )
         targetPos = preview:GetPos() - targetPos
-        targetPos = tr.HitPos + targetPos
-        targetPos.z = math.Clamp( targetPos.z, tr.HitPos.z, 100000 )
+        targetPos = clampPos + targetPos
+        targetPos.z = math.Clamp( targetPos.z, clampPos.z, 100000 )
 
         local traceEnt = tr.Entity
         if IsValid( traceEnt ) and traceEnt:GetNWBool( "IsPoliceProp", false ) then
@@ -287,7 +287,6 @@ if CLIENT then
             holdTime = 0
         end
     end
-
     function CreateBuildPreview( mdl )
         if not IsValid( policePropPreview ) then
             policePropPreview = ents.CreateClientProp( "prop_physics" )
@@ -297,7 +296,7 @@ if CLIENT then
             policePropPreview:SetModel( mdl )
         end
 
-        hook.Add( "CreateMove", "Police.Props.CreateMove", function( cmd )
+        hook.Add( "CreateMove", policePropPreview, function( ent, cmd )
             cmd:RemoveKey( IN_ATTACK )
             cmd:RemoveKey( IN_RELOAD )
         end )
@@ -354,13 +353,6 @@ if CLIENT then
         addNamePlate( policePropPreview, titleText )
     end
 
-    net.Receive( "Police.Props.Notify", function()
-        local msg = net.ReadString()
-        if not msg or msg == "" then return end
-
-        notification.AddLegacy( msg, 0, 5 )
-    end )
-
     net.Receive( "Police.Props.Deploy", function()
         timer.Simple( 0.1, function()
             local weapon = LocalPlayer():GetActiveWeapon()
@@ -372,13 +364,9 @@ if CLIENT then
     end )
 
     net.Receive( "Police.Props.Holster", function()
-        local weapon = LocalPlayer():GetActiveWeapon()
-        if not IsValid( weapon ) then return end
-
         hook.Remove( "PostDrawOpaqueRenderables", "PolicePropPreview" )
         hook.Remove( "PreDrawHalos", "Police.Props.Halo" )
         hook.Remove( "HUDPaint", "PolicePropPreview" )
-        hook.Remove( "CreateMove", "Police.Props.CreateMove" )
         haloDrawing = false
 		tracingMultSkinEnt = false
         timer.Simple( 0.01, function()
@@ -487,12 +475,6 @@ else
         return tr
     end
 
-    function PoliceNotify( ply, msg )
-        net.Start( "Police.Props.Notify" )
-            net.WriteString( msg )
-        net.Send( ply )
-    end
-
     net.Receive( "Police.Props.Skin", function( len, ply )
     	if not IsValid( ply ) then return end
 
@@ -510,10 +492,10 @@ else
         local pos = net.ReadVector()
         local ang = net.ReadAngle()
 
-        local maxNumberPoliceProps = GetConVar( "PolicePropsMax" ):GetInt()
+        local maxNumberPoliceProps = GetConVar( "sbox_maxpoliceprops" ):GetInt()
         if not maxNumberPoliceProps then return end
         
-        if ply.SpawnedPoliceProps and table.Count( ply.SpawnedPoliceProps ) >= maxNumberPoliceProps then
+        if ply.SpawnedPoliceProps and Player:CheckLimit( "policeprops" ) then
             PoliceNotify( ply, "You've hit the limit for how many police props you can spawn ( " .. maxNumberPoliceProps .. " )." )
             return
         end
@@ -531,13 +513,14 @@ else
         if CPPI then
             propSpawn:CPPISetOwner( ply )
         else
-            propSpawn.SpawnedOwner = ply
+            propSpawn:SetNWEntity( "SpawnedOwner", ply )
         end
 
         propSpawn:Spawn()
         propSpawn:Activate()
         propSpawn:SetNWBool( "IsPoliceProp", true )
-        
+
+        ply:AddCount( "policetape", propSpawn )
         ply.SpawnedPoliceProps = ply.SpawnedPoliceProps or {}
         ply.SpawnedPoliceProps[ propSpawn:EntIndex() ] = propSpawn
 
@@ -573,7 +556,7 @@ else
         if CPPI then
             owner = ent:CPPIGetOwner()
         else
-            owner = ent.SpawnedOwner
+            owner = ent:GetNWEntity( "SpawnedOwner", nil )
         end
         if not IsValid( owner ) then return end
 
