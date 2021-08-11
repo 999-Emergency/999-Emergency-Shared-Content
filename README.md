@@ -13,6 +13,7 @@ The current team members are of the following;
 | [GermanDude](https://steamcommunity.com/id/theonlygermandude) | Skins |
 | [SGM](https://github.com/SentryGunMan) | Custom Models, Helicopter skin & model |
 | [Unkn0wn_F1R3](https://steamcommunity.com/id/Unkn0wn_F1R3) | Playermodel textures, Vehicle Skin |
+| [Adolf Gutenberg](https://steamcommunity.com/id/AdolfGutenberg) | Vehicle Skins, Photon, Playermodel Skins |
 
 The team at 999Emergency are always looking for more people to join our team. 
 Whether that be as a Team Member or as part-time contributions, all help is appreciated. 
