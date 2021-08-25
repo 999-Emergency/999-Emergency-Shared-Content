@@ -133,7 +133,7 @@ function SWEP:PrimaryAttack()
             owner.SpawnedPoliceTape = owner.SpawnedPoliceTape or {}
             owner.SpawnedPoliceTape[ 1 ] = owner.SpawnedPoliceTape[ 1 ] or {}
             owner.SpawnedPoliceTape[ 2 ] = owner.SpawnedPoliceTape[ 2 ] or {}
-            owner.SpawnedPoliceTape[ 1 ][ table.Count( owner.SpawnedPoliceTape[ 1 ] ) + 1 or 1 ] = tape:EntIndex()
+            owner.SpawnedPoliceTape[ 1 ][ #owner.SpawnedPoliceTape[ 1 ] + 1 or 1 ] = tape:EntIndex()
             owner.SpawnedPoliceTape[ 2 ][ tape:EntIndex() ] = tape
             owner:AddCount( "police_tape", tape )
 
@@ -241,7 +241,7 @@ function SWEP:SecondaryAttack()
     if not owner.SpawnedPoliceTape then return end
     if not owner.SpawnedPoliceTape[ 1 ] then return end
 
-    local lastInsert = table.Count( owner.SpawnedPoliceTape[ 1 ] )
+    local lastInsert = #owner.SpawnedPoliceTape[ 1 ]
     if not lastInsert then return end
 
     local lastEntIndex = owner.SpawnedPoliceTape[ 1 ][ lastInsert ]
