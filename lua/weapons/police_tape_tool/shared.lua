@@ -250,7 +250,7 @@ function SWEP:SecondaryAttack()
     local actEnt = owner.SpawnedPoliceTape[ 2 ][ lastEntIndex ]
     if IsValid( actEnt ) then
         actEnt:Remove()
-        PoliceNotify( owner, "The last tape put up has been remove." )
+        PoliceNotify( owner, "The last tape was removed." )
     end
 
     owner.SpawnedPoliceTape[ 1 ][ lastInsert ] = nil
