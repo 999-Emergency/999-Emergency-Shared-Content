@@ -187,7 +187,6 @@ local function DrawPolicePropHook()
     preview:SetNoDraw( false )
 
     placeTime = placeTime or CurTime()
-    print( switchCoolDown )
     if ( switchCoolDown and switchCoolDown < CurTime() ) and gui.MouseX() == 0 and input.IsMouseDown( MOUSE_FIRST ) and placeTime + 1 < CurTime() then
         holdTime = holdTime + 10 * FrameTime()
         if holdTime < 2 then return end
