@@ -7,6 +7,7 @@ local policePropList = {
 }
 local maxDistance = 275625
 local PoliceSelectedProp = 1
+local policePropPreview
 
 local function CreateBuildPreview( mdl )
     if not IsValid( policePropPreview ) then
@@ -17,7 +18,12 @@ local function CreateBuildPreview( mdl )
         policePropPreview:SetModel( mdl )
     end
 
-    hook.Add( "CreateMove", policePropPreview, function( ent, cmd )
+    hook.Add( "CreateMove", "Remove.Key.Conflict", function( cmd )
+        if not IsValid( policePropPreview ) then -- fallback shouldn't be necessary
+            hook.Remove( "CreateMove", "Remove.Key.Conflict" )
+            return
+        end
+        
         cmd:RemoveKey( IN_ATTACK )
         cmd:RemoveKey( IN_RELOAD )
     end )
@@ -208,6 +214,7 @@ local function RemoveBuildPreview()
     if IsValid( policePropPreview ) then
         policePropPreview:Remove()
     end
+    policePropPreview = nil
 end
 
 RemoveBuildPreview()
@@ -268,6 +275,7 @@ net.Receive( "Police.Props.Holster", function()
     hook.Remove( "PostDrawOpaqueRenderables", "PolicePropPreview" )
     hook.Remove( "PreDrawHalos", "Police.Props.Halo" )
     hook.Remove( "HUDPaint", "PolicePropPreview" )
+    hook.Remove( "CreateMove", "Remove.Key.Conflict" )
     haloDrawing = false
     tracingMultSkinEnt = false
     RemoveBuildPreview()
